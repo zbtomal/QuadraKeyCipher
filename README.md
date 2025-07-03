@@ -44,7 +44,7 @@ The algorithm's security is built on several mathematical concepts:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/quadrakey-cipher.git
+git clone https://github.com/zbtomal/quadrakey-cipher.git
 cd quadrakey-cipher
 
 # Compile the program
