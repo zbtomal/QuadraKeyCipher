@@ -1,0 +1,450 @@
+===============================================================================
+                        QUADRAKEY CIPHER ALGORITHM PSEUDOCODE
+===============================================================================
+
+Algorithm Name: QuadraKey Cipher
+Developer: Zikrul Bari Tomal (ID: 2102056)
+Course: CSE 361 - Mathematical Analysis for Computer Science
+Institution: Hajee Mohammad Danesh Science and Technology University
+Date: 2024
+
+===============================================================================
+                              ALGORITHM OVERVIEW
+===============================================================================
+
+The QuadraKey Cipher uses quadratic mathematical formulas to generate dynamic
+keys for each character position, providing enhanced security through:
+- Position-dependent key generation
+- Mathematical formula-based encryption
+- Modular arithmetic with prime numbers
+- Reversible transformation process
+
+Mathematical Foundation:
+Key Generation Formula: key(i) = (a * i² + b * i + c) % prime
+Where: a, b, c are coefficients, i is position, prime is modulus
+
+===============================================================================
+                           MAIN ALGORITHM STRUCTURE
+===============================================================================
+
+CLASS QuadraKey_Cipher:
+    PRIVATE ATTRIBUTES:
+        INTEGER a, b, c, prime  // Mathematical formula parameters
+    
+    PUBLIC METHODS:
+        CONSTRUCTOR(a, b, c, prime)
+        FUNCTION encrypt(plaintext)
+        FUNCTION decrypt(ciphertext)
+        FUNCTION calculateDynamicKey(position)
+        FUNCTION displayInfo()
+        FUNCTION showKeyProgression()
+
+===============================================================================
+                          CONSTRUCTOR PSEUDOCODE
+===============================================================================
+
+ALGORITHM QuadraKey_Constructor(coeff_a, coeff_b, coeff_c, prime_number)
+BEGIN
+    INPUT: coeff_a, coeff_b, coeff_c, prime_number
+    
+    // Initialize mathematical formula parameters
+    SET a = coeff_a
+    SET b = coeff_b  
+    SET c = coeff_c
+    SET prime = prime_number
+    
+    // Validate inputs
+    IF prime <= 0 THEN
+        THROW ERROR "Prime number must be positive"
+    END IF
+    
+    OUTPUT: Initialized QuadraKey cipher object
+END
+
+===============================================================================
+                        DYNAMIC KEY CALCULATION PSEUDOCODE
+===============================================================================
+
+ALGORITHM calculateDynamicKey(position)
+BEGIN
+    INPUT: position (integer i)
+    
+    // Calculate quadratic formula: key(i) = (a*i² + b*i + c) % prime
+    SET i_squared = position * position
+    SET quadratic_term = a * i_squared
+    SET linear_term = b * position
+    SET constant_term = c
+    
+    SET key_value = (quadratic_term + linear_term + constant_term) % prime
+    
+    // Ensure positive result
+    IF key_value < 0 THEN
+        SET key_value = key_value + prime
+    END IF
+    
+    OUTPUT: key_value
+END
+
+===============================================================================
+                            ENCRYPTION PSEUDOCODE
+===============================================================================
+
+ALGORITHM QuadraKey_Encrypt(plaintext)
+BEGIN
+    INPUT: plaintext (string)
+    
+    // Initialize variables
+    SET ciphertext = ""
+    SET text_length = LENGTH(plaintext)
+    
+    // Process each character
+    FOR i = 0 TO text_length - 1 DO
+        // Get current character
+        SET current_char = plaintext[i]
+        SET ascii_value = ASCII_VALUE(current_char)
+        
+        // Calculate dynamic key for current position
+        SET dynamic_key = calculateDynamicKey(i)
+        
+        // Apply transformation
+        SET encrypted_value = ascii_value + dynamic_key + i
+        
+        // Apply modular arithmetic to keep in printable range (32-126)
+        SET adjusted_value = encrypted_value - 32
+        SET modular_result = adjusted_value % 95
+        SET final_encrypted = modular_result + 32
+        
+        // Convert back to character and append
+        SET encrypted_char = CHARACTER(final_encrypted)
+        SET ciphertext = ciphertext + encrypted_char
+    END FOR
+    
+    OUTPUT: ciphertext
+END
+
+===============================================================================
+                            DECRYPTION PSEUDOCODE
+===============================================================================
+
+ALGORITHM QuadraKey_Decrypt(ciphertext)
+BEGIN
+    INPUT: ciphertext (string)
+    
+    // Initialize variables
+    SET plaintext = ""
+    SET text_length = LENGTH(ciphertext)
+    
+    // Process each character
+    FOR i = 0 TO text_length - 1 DO
+        // Get current encrypted character
+        SET current_char = ciphertext[i]
+        SET ascii_value = ASCII_VALUE(current_char)
+        
+        // Calculate same dynamic key for current position
+        SET dynamic_key = calculateDynamicKey(i)
+        
+        // Reverse the transformation
+        SET decrypted_value = ascii_value - dynamic_key - i
+        
+        // Handle wrap-around for ASCII values
+        WHILE decrypted_value < 32 DO
+            SET decrypted_value = decrypted_value + 95
+        END WHILE
+        
+        WHILE decrypted_value > 126 DO
+            SET decrypted_value = decrypted_value - 95
+        END WHILE
+        
+        // Convert back to character and append
+        SET decrypted_char = CHARACTER(decrypted_value)
+        SET plaintext = plaintext + decrypted_char
+    END FOR
+    
+    OUTPUT: plaintext
+END
+
+===============================================================================
+                        COMPLETE ENCRYPTION PROCESS
+===============================================================================
+
+ALGORITHM Complete_Encryption_Process(plaintext, a, b, c, prime)
+BEGIN
+    INPUT: plaintext, mathematical parameters (a, b, c, prime)
+    
+    // Step 1: Initialize cipher
+    SET cipher = QuadraKey_Constructor(a, b, c, prime)
+    
+    // Step 2: Display algorithm information
+    CALL cipher.displayInfo()
+    
+    // Step 3: Show key progression
+    CALL cipher.showKeyProgression()
+    
+    // Step 4: Encrypt the plaintext
+    SET encrypted_text = cipher.encrypt(plaintext)
+    
+    // Step 5: Display results
+    PRINT "Original Text: " + plaintext
+    PRINT "Encrypted Text: " + encrypted_text
+    
+    OUTPUT: encrypted_text
+END
+
+===============================================================================
+                        COMPLETE DECRYPTION PROCESS
+===============================================================================
+
+ALGORITHM Complete_Decryption_Process(ciphertext, a, b, c, prime)
+BEGIN
+    INPUT: ciphertext, mathematical parameters (a, b, c, prime)
+    
+    // Step 1: Initialize cipher with same parameters
+    SET cipher = QuadraKey_Constructor(a, b, c, prime)
+    
+    // Step 2: Decrypt the ciphertext
+    SET decrypted_text = cipher.decrypt(ciphertext)
+    
+    // Step 3: Display results
+    PRINT "Encrypted Text: " + ciphertext
+    PRINT "Decrypted Text: " + decrypted_text
+    
+    OUTPUT: decrypted_text
+END
+
+===============================================================================
+                            UTILITY FUNCTIONS
+===============================================================================
+
+ALGORITHM displayInfo()
+BEGIN
+    PRINT "=== QuadraKey Cipher Algorithm ==="
+    PRINT "Mathematical Formula: key(i) = (" + a + "*i² + " + b + "*i + " + c + ") % " + prime
+    PRINT "Coefficients: a=" + a + ", b=" + b + ", c=" + c
+    PRINT "Prime Modulus: " + prime
+    PRINT "Algorithm: Position-based transformation with dynamic mathematical key"
+    PRINT "================================="
+END
+
+ALGORITHM showKeyProgression(positions)
+BEGIN
+    INPUT: positions (number of positions to show)
+    
+    PRINT "Key Progression for first " + positions + " positions:"
+    
+    FOR i = 0 TO positions - 1 DO
+        SET key = calculateDynamicKey(i)
+        SET i_squared = i * i
+        
+        PRINT "Position " + i + ": key(" + i + ") = (" + a + "*" + i_squared + 
+              " + " + b + "*" + i + " + " + c + ") % " + prime + " = " + key
+    END FOR
+    
+    PRINT ""
+END
+
+===============================================================================
+                            TEST CASE PSEUDOCODE
+===============================================================================
+
+ALGORITHM runTestCase(test_number, plaintext, a, b, c, prime)
+BEGIN
+    INPUT: test_number, plaintext, mathematical parameters
+    
+    PRINT "--- Test Case " + test_number + " ---"
+    
+    // Initialize cipher
+    SET cipher = QuadraKey_Constructor(a, b, c, prime)
+    
+    // Display information
+    CALL cipher.displayInfo()
+    CALL cipher.showKeyProgression(5)
+    
+    // Perform encryption
+    PRINT "Original Text: " + plaintext
+    SET encrypted = cipher.encrypt(plaintext)
+    PRINT "Encrypted Text: " + encrypted
+    
+    // Perform decryption
+    SET decrypted = cipher.decrypt(encrypted)
+    PRINT "Decrypted Text: " + decrypted
+    
+    // Verify success
+    IF plaintext = decrypted THEN
+        PRINT "Success: YES"
+    ELSE
+        PRINT "Success: NO"
+        PRINT "ERROR: Decryption failed!"
+    END IF
+    
+    PRINT ""
+END
+
+===============================================================================
+                         INTERACTIVE MODE PSEUDOCODE
+===============================================================================
+
+ALGORITHM interactiveMode()
+BEGIN
+    PRINT "=== Interactive Mode ==="
+    
+    // Get user input for mathematical parameters
+    PRINT "Enter coefficient 'a' for ai²: "
+    INPUT a
+    
+    PRINT "Enter coefficient 'b' for bi: "
+    INPUT b
+    
+    PRINT "Enter coefficient 'c' for constant term: "
+    INPUT c
+    
+    PRINT "Enter prime number for modulus: "
+    INPUT prime
+    
+    PRINT "Enter text to encrypt: "
+    INPUT user_text
+    
+    // Create cipher and process
+    SET cipher = QuadraKey_Constructor(a, b, c, prime)
+    
+    PRINT "--- Results ---"
+    CALL cipher.displayInfo()
+    CALL cipher.showKeyProgression(5)
+    
+    PRINT "Original Text: " + user_text
+    SET encrypted = cipher.encrypt(user_text)
+    PRINT "Encrypted Text: " + encrypted
+    
+    SET decrypted = cipher.decrypt(encrypted)
+    PRINT "Decrypted Text: " + decrypted
+    
+    // Verify success
+    IF user_text = decrypted THEN
+        PRINT "Encryption/Decryption Success: YES"
+    ELSE
+        PRINT "Encryption/Decryption Success: NO"
+    END IF
+END
+
+===============================================================================
+                         MAIN PROGRAM PSEUDOCODE
+===============================================================================
+
+ALGORITHM main()
+BEGIN
+    PRINT "QuadraKey Cryptographic Algorithm"
+    PRINT "Mathematical Formula-Based Encryption/Decryption"
+    PRINT "================================================"
+    
+    SET choice = 0
+    
+    REPEAT
+        PRINT "Choose an option:"
+        PRINT "1. Run Test Cases"
+        PRINT "2. Interactive Mode"
+        PRINT "3. Demonstrate Mathematical Properties"
+        PRINT "4. Exit"
+        PRINT "Enter your choice (1-4): "
+        
+        INPUT choice
+        
+        SWITCH choice
+            CASE 1:
+                CALL runAllTestCases()
+                BREAK
+            CASE 2:
+                CALL interactiveMode()
+                BREAK
+            CASE 3:
+                CALL demonstrateMathematicalProperties()
+                BREAK
+            CASE 4:
+                PRINT "Exiting program. Goodbye!"
+                BREAK
+            DEFAULT:
+                PRINT "Invalid choice. Please enter 1-4."
+        END SWITCH
+        
+    UNTIL choice = 4
+END
+
+===============================================================================
+                    MATHEMATICAL PROPERTIES DEMONSTRATION
+===============================================================================
+
+ALGORITHM demonstrateMathematicalProperties()
+BEGIN
+    PRINT "=== Mathematical Properties Demonstration ==="
+    
+    SET test_text = "MATH"
+    PRINT "Testing text: " + test_text
+    PRINT "Comparing different mathematical formulas:"
+    
+    // Linear formula demonstration
+    PRINT "1. Linear Formula: key(i) = (0*i² + 5*i + 3) % 97"
+    SET linear_cipher = QuadraKey_Constructor(0, 5, 3, 97)
+    CALL linear_cipher.showKeyProgression(4)
+    PRINT "Encrypted: " + linear_cipher.encrypt(test_text)
+    
+    // Quadratic formula demonstration
+    PRINT "2. Quadratic Formula: key(i) = (2*i² + 3*i + 5) % 97"
+    SET quadratic_cipher = QuadraKey_Constructor(2, 3, 5, 97)
+    CALL quadratic_cipher.showKeyProgression(4)
+    PRINT "Encrypted: " + quadratic_cipher.encrypt(test_text)
+    
+    // Different prime demonstration
+    PRINT "3. Same Quadratic, Different Prime: key(i) = (2*i² + 3*i + 5) % 101"
+    SET different_prime_cipher = QuadraKey_Constructor(2, 3, 5, 101)
+    CALL different_prime_cipher.showKeyProgression(4)
+    PRINT "Encrypted: " + different_prime_cipher.encrypt(test_text)
+    
+    PRINT "Observation: Different formulas produce completely different encryptions!"
+END
+
+===============================================================================
+                             COMPLEXITY ANALYSIS
+===============================================================================
+
+Time Complexity:
+- Encryption: O(n) where n is the length of plaintext
+- Decryption: O(n) where n is the length of ciphertext
+- Key Generation: O(1) for each position
+- Overall: O(n) linear time complexity
+
+Space Complexity:
+- Additional Space: O(1) for variables
+- Input Storage: O(n) for plaintext/ciphertext
+- Output Storage: O(n) for result
+- Overall: O(n) space complexity
+
+Performance Characteristics:
+- Efficient character-by-character processing
+- Constant time key generation per position
+- No recursive calls or complex data structures
+- Minimal memory overhead
+
+===============================================================================
+                              SECURITY NOTES
+===============================================================================
+
+Security Strengths:
+1. Mathematical formula creates non-linear key progression
+2. Each character position has unique encryption key
+3. Prime number modulus adds mathematical complexity
+4. Position-dependent encryption resists frequency analysis
+5. Quadratic formula prevents simple pattern recognition
+
+Security Limitations:
+1. Vulnerable to known-plaintext attacks if parameters discovered
+2. Mathematical formula parameters must remain secret
+3. Not suitable for high-security applications without additional layers
+4. Susceptible to cryptanalysis with sufficient ciphertext samples
+
+Recommended Usage:
+- Educational purposes and algorithm learning
+- Academic projects and assignments
+- Cryptographic research and analysis
+- Mathematical concept demonstrations
+
+===============================================================================
+                                 END OF FILE
+===============================================================================
